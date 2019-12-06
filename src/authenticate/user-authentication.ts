@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { userModel, userClass } from '../user-creation/models/user-model';
+import { userModel, userClass, ResponseHeader} from '../user-creation/models/user-model';
 import { userLoginSchema } from '../user-creation/joi_schema/user-registration';
 import bcrypt from 'bcrypt';
 
@@ -13,12 +13,17 @@ router.post('/auth', (req: Request, res: Response) => {
 
 async function validateUser(req: Request, res: Response) {
     try {
-        const data = await userModel.findOne({email: req.body.email}).select('password').exec();
+        const data = await userModel.findOne({email: req.body.email}).select('password').select('_id').exec();
         const hashPasswrd = data ? (<userClass><unknown>data).password : '';
-        if(await bcrypt.compare(req.body.password, hashPasswrd)) { res.status(200).send(`Authenticated Successfully`) }
+        const _id = data ? (<userClass><unknown>data)._id : '';
+        if(await bcrypt.compare(req.body.password, hashPasswrd)) {
+            let responseHeader = new ResponseHeader(req.body.email, _id);
+            const token = (new userModel() as any).generateAuthToken(responseHeader);
+            res.header('x-auth-token', token).status(200).send('User Validated Successfully'); 
+        }
         else { res.status(400).send(`Check Username and Password`) }
     } catch(e) {
-        console.log(`errrrrrr ${e}`);
+        res.status(400).send(`Check Username and Password`)
     }
 }
 
