@@ -7,6 +7,7 @@ import { errBuilder } from './custom-utilities/error-service';
 
 import { userCreationRouter }  from './user-creation/user-creation';
 import { userAuthenticationRouter } from './authenticate/user-authentication';
+import { authenticateToken } from './middleware/auth-token';
 
 app.use(bodyParser.json());
 app.use(setCors);

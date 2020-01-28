@@ -15,7 +15,7 @@ router.post('/register' , (req: Request, res: Response) => {
 });
 
 router.post('/registersimple', authenticateToken, (req: Request, res: Response) => {
-    res.status(200).send(`Something went wrong.Try again.`);
+    res.status(200).send('Success');
 });
 
 async function saveUserDetails(obj:any, res:Response){

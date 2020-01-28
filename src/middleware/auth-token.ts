@@ -1,12 +1,19 @@
 import { Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import { PRIVATE_KEY } from '../user-creation/models/user-model';
+import { errBuilder } from "../custom-utilities/error-service";
 
 export function authenticateToken(req: customRequest, res: any, next: any) {
     const token = req.header('x-auth-token');
-    if(!token) { res.status(400).send(`No Token Provided`) }
+    if(!token) { res.status(400).send(errBuilder(`No Token Provided`)) }
     else {
-        console.log(jwt.verify(token, PRIVATE_KEY));
+        // console.log(jwt.verify(token, PRIVATE_KEY));
+        try{
+            jwt.verify(token, PRIVATE_KEY);
+        } catch(e) {
+            console.log(e);
+            res.status(500).send(errBuilder(`Invalid Token`, 'JsonWebTokenError')) 
+        }
     }
     next();
 }
