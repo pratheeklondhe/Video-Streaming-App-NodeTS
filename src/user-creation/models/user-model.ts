@@ -4,7 +4,9 @@ import _ from 'lodash';
 import { Roles } from "../entity/roles";
 
 export const PRIVATE_KEY = 'thisisaprivatekey';
-
+/**
+ * This is the user Domain
+ */
 export let userSchema = new Mongo.Schema({
     userName: { type: String, minlength: 5, maxlength: 30, required: true },
     email: { type: String, minlength: 3, maxlength: 30, required: true, unique: true },
