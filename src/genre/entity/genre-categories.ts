@@ -5,5 +5,6 @@ export enum Categories {
     ROMANCE = 'Romance',
     LOVE = 'Love',
     FANTASY = 'Fantasy',
-    COMEDY = 'Comedy'
+    COMEDY = 'Comedy',
+    TRENDING = 'Trending'
 }
