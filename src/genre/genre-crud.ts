@@ -36,9 +36,12 @@ router.get('/getgenreofcategory', authenticateUser, async (req: Request, res: Re
     try{
         if((!req.query.category) ||
         (!req.query.skip) ||
-        (!req.query.limit || Number(req.query.limit) > 10))
+        (!req.query.limit || Number(req.query.limit) > 10) || (!req.query.genreId))
         throw new Error('Invalid Category');
-        const genres = await genreModel.find({category: { $in: [req.query.category] }}).limit(2);
+        const genres = await genreModel.find({
+            category: { $in: [req.query.category] }, 
+            genreId: { $ne: req.query.genreId } }
+            ).limit(2);
         if (genres) res.status(200).send(genres);
         else throw new Error('Invalid Category');
     } catch(e) {
@@ -52,7 +55,7 @@ async function generateResponse() {
         const categyKeys = Object.keys(Categories);
         const obj: any = {};
         const responseProperties = ['genreId', 'screenshots',
-                             'displayImg', 'title', 'description'];
+                             'displayImg', 'title', 'description', 'category'];
         for(let i=0; i< categyKeys?.length; i++) {
             const query = { category: { $in: [categyValues[i]] } };
             obj[categyKeys[i]] = await genreModel.find(query, responseProperties);
