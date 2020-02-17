@@ -5,40 +5,58 @@ import { errBuilder } from "../custom-utilities/error-service";
 import { Roles } from "../user-creation/entity/roles";
 
 export function authenticateUser(req: customRequest, res: any, next: any) {
-    try{
+    try {
         const decodedToken = authenticateToken(req, res);
-        if (decodedToken?.role?.toString() !== Roles.USER) throw new Error('Invalid User');
+        if (decodedToken ?.role ?.toString() !== Roles.USER) throw new Error('Invalid User');
         else next();
-    } catch(e) {
-        res.status(500).send(errBuilder(e?.message, 'AuthError'))  
+    } catch (e) {
+        res.status(500).send(errBuilder(e ?.message, 'AuthError'))
     }
 }
 
 export function authenticateAdmin(req: customRequest, res: any, next: any) {
-    try{
+    try {
         const decodedToken = authenticateToken(req, res);
-        if (decodedToken?.role?.toString() !== Roles.ADMIN) throw new Error('Invalid User');
+        if (decodedToken ?.role ?.toString() !== Roles.ADMIN) throw new Error('Invalid User');
         else next();
-    } catch(e) {
-        res.status(500).send(errBuilder(e?.message, 'AuthError'))  
+    } catch (e) {
+        res.status(500).send(errBuilder(e ?.message, 'AuthError'))
     }
 }
 
 function authenticateToken(req: customRequest, res: any): token | undefined {
     const token = req.header('x-auth-token');
-    if(!token) { res.status(400).send(errBuilder(`No Token Provided`)); }
+    if (!token) { res.status(400).send(errBuilder(`No Token Provided`)); }
     else {
-        try{
+        try {
             return <token>jwt.verify(token, PRIVATE_KEY);
-        } catch(e) {
-            res.status(500).send(errBuilder(`Invalid Token`, 'JsonWebTokenError')) 
+        } catch (e) {
+            res.status(500).send(errBuilder(`Invalid Token`, 'JsonWebTokenError'));
         }
+    }
+}
+
+export function authenticateUserAsString(token: string): boolean {
+    try {
+        const decodedToken = authenticateTokenAsString(token);
+        if (decodedToken ?.role ?.toString() !== Roles.USER) throw new Error('Invalid User');
+        else return true;
+    } catch (e) {
+        throw e;
+    }
+}
+
+function authenticateTokenAsString(token: string) {
+    try {
+        return <token>jwt.verify(token, PRIVATE_KEY);
+    } catch (e) {
+        throw e;
     }
 }
 
 
 interface customRequest extends Request {
-    user: customUser; 
+    user: customUser;
 }
 
 class customUser {
