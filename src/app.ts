@@ -18,13 +18,17 @@ app.post('/genre' , (req) => {
     } catch(e) {
         throw e;
     }
-})
+});
 
+app.get('/' , (req, res) => {
+    res.status(200).send('WOW, Iam up and running');
+});
 
+App.start();
 
 App.mongoConnect()
     .then((data: string) => {
-        App.start();
+        // App.start();
         console.log(data);
     })
     .catch((err: Error) => console.error(err.message));
