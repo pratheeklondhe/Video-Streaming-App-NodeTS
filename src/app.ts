@@ -21,7 +21,7 @@ app.post('/genre' , (req) => {
 });
 
 app.get('/' , (req, res) => {
-    res.status(200).send('WOW, Iam up and running');
+    res.status(200).send('WOW, Iam up and running an Updated');
 });
 
 App.start();

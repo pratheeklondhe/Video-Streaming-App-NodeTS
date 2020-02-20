@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
-const mongodb = process.env.NODE_MONGO || 'mongodb://localhost/local_sample';
+const mongodb = process.env.MONGODB_URI || 'mongodb://localhost/local_sample';
 
 let App = {
     port: process.env.PORT || 3000,
