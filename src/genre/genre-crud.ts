@@ -67,6 +67,7 @@ router.get('/stream/:genreid/:token', async (req: Request, res: Response) => {
 
 
 async function findAndRenderGenre(req: Request, res: Response) {
+    try{
     const genreStaticFiles = <GenreStaticFiles><unknown>await genreStaticFilesModel.findOne({ genreId: req.params.genreid });
     if (genreStaticFiles && genreStaticFiles.genreFileUrl) {
         res.writeHead(200, { 'Content-Type': 'video/mp4' });
@@ -76,6 +77,9 @@ async function findAndRenderGenre(req: Request, res: Response) {
     }
     else {
         throw new Error(`Genre-${req.params.genreid} Not Available`);
+    }
+    } catch(e) {
+        console.log(e);
     }
 }
 
