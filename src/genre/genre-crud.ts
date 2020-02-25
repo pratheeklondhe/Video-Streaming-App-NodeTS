@@ -71,8 +71,8 @@ async function findAndRenderGenre(req: Request, res: Response) {
     const genreStaticFiles = <GenreStaticFiles><unknown>await genreStaticFilesModel.findOne({ genreId: req.params.genreid });
     if (genreStaticFiles && genreStaticFiles.genreFileUrl) {
         res.writeHead(200, { 'Content-Type': 'video/mp4' });
-        console.log(__dirname + '/../../assets/file_example_MP4_1920_18MG.mp4');
-        const rs = fs.createReadStream(__dirname + '/../../assets/file_example_MP4_1920_18MG.mp4');
+        console.log(__dirname + '/../../assets/videoplayback.mp4');
+        const rs = fs.createReadStream(__dirname + '/../../assets/videoplayback.mp4');
         rs.pipe(res);
     }
     else {
