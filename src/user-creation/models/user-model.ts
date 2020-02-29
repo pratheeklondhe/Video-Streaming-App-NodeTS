@@ -1,4 +1,4 @@
-import { Mongo } from "../../config/appconfig";
+import { Mongo, mongooseConnection } from "../../config/appconfig";
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Roles } from "../entity/roles";

@@ -1,8 +1,7 @@
 import multer from 'multer';
 import GridFsStorage from 'multer-gridfs-storage';
-import { mongoURI, genreVideoDBcollectionName, Mongo, mongooseConnection } from './../config/appconfig';
+import { mongoURI, genreVideoDBcollectionName, Mongo, mongooseConnection } from '../config/appconfig';
 import Grid from 'gridfs-stream';
-import { Connection } from 'mongoose';
 
 const storage = new GridFsStorage({
     url: mongoURI,
@@ -18,7 +17,7 @@ const storage = new GridFsStorage({
 });
 
 export function createGridStream(mongooseConnectn = mongooseConnection.db, mongo = Mongo.mongo): Grid.Grid {
-    return Grid(mongooseConnectn, mongo);
+    return Grid(mongooseConnectn, Mongo.mongo);
 }
 
 

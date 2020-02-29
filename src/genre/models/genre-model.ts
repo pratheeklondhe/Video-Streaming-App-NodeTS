@@ -1,10 +1,11 @@
-import { Mongo } from "../../config/appconfig";
+import { Mongo, mongooseConnection } from "../../config/appconfig";
 import { Languages } from "../entity/genre-language";
 import { Categories } from "../entity/genre-categories";
 
 export var genreSchema = new Mongo.Schema({
     genreId: { type: String, minlength: 3, required: true, unique: true },
     title: { type: String, minlength: 3, required: true },
+    genreTitle: { type: String, minlength: 3, required: true },
     description: { type: String, minlength: 10, required: true},
     language: { type: String, enum:[...Object.values(Languages)], minlength: 2, required: true},
     category: { type: [String], enum: [...Object.values(Categories)], required: true },
@@ -39,6 +40,7 @@ export let genreModel = Mongo.model('vsnodeapp_genre', genreSchema, 'vsnodeapp_g
 export interface Genre {
     genreId: String,
     title: String,
+    genreTitle: String,
     description: String,
     language: Languages,
     category: [Categories],

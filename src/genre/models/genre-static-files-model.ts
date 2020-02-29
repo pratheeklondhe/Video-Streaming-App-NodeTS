@@ -1,5 +1,5 @@
 
-import { Mongo } from "../../config/appconfig";
+import { Mongo, mongooseConnection } from "../../config/appconfig";
 
 export var genreStaticFilesSchema = new Mongo.Schema({
     genreId: { type: String, minlength: 3, required: true, unique: true },

@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { setCors } from './middleware/CORS';
 import { genreModel } from './genre/models/genre-model';
 import { initializeRouters } from './custom-utilities/router-initialize';
-import { upload, createGridStream } from './upload-files/file-upload-init';
+import { upload, createGridStream } from './stream-files/file-stream-init';
 
 app.use(bodyParser.json());
 app.use(setCors);
@@ -32,9 +32,9 @@ app.get('/', (req, res) => {
     const gfs = createGridStream();
     gfs.collection(genreVideoDBcollectionName);
     const readstream = gfs.createReadStream({
-        filename: 'package.json'
+        filename: '1e61d095d4bf409ba6a67b70ae0cbbce.mp4'
     });
-    // res.writeHead(200, { 'Content-Type': 'video/mp4' });
+    res.writeHead(200, { 'Content-Type': 'video/mp4' });
     readstream.pipe(res);
 });
 

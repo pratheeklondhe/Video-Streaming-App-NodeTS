@@ -2,11 +2,11 @@ import express from 'express';
 import path from 'path';
 import mongoose from 'mongoose';
 
-
+mongoose.Promise = global.Promise;
 export const genreVideoDBcollectionName = 'genreVideo';
 export const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/local_sample';
 const env = process.env.NODE_ENV || 'development';
-let mongooseConnection: mongoose.Connection;
+let mongooseConnection: any;
 
 const app = express();
 
@@ -23,7 +23,8 @@ let App = {
     },
     async mongoConnect() {
         try{
-            mongooseConnection = await mongoose.createConnection(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true});
+            await mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true});
+            mongooseConnection = mongoose.connection
             return `Mongoose Connected to ${mongoURI}`;
         } catch(e) {
             throw new Error(`Could not Connect to ${mongoURI}`);

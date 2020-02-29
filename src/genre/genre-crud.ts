@@ -5,6 +5,7 @@ import { errBuilder } from '../custom-utilities/error-service';
 import { authenticateUser, authenticateUserAsString } from '../middleware/auth-token';
 import fs from 'fs';
 import { genreStaticFilesModel, GenreStaticFiles } from './models/genre-static-files-model';
+import { streamGenre } from '../stream-files/genre-stream';
 
 
 const router = express.Router();
@@ -58,30 +59,43 @@ router.get('/getgenreofcategory', authenticateUser, async (req: Request, res: Re
 router.get('/stream/:genreid/:token', async (req: Request, res: Response) => {
     try {
         authenticateUserAsString(req.params.token);
-        await findAndRenderGenre(req, res);
+        const genreTitle = await getGenreTitle(req, res);
+        streamGenre(req, res, genreTitle);
     } catch (e) {
         res.status(404).send(errBuilder(e ?.message, 'GenreError'));
     }
 });
 
-
-
-async function findAndRenderGenre(req: Request, res: Response) {
+async function getGenreTitle(req: Request, res: Response): Promise<string>{
     try{
-    const genreStaticFiles = <GenreStaticFiles><unknown>await genreStaticFilesModel.findOne({ genreId: req.params.genreid });
-    if (genreStaticFiles && genreStaticFiles.genreFileUrl) {
-        res.writeHead(200, { 'Content-Type': 'video/mp4' });
-        console.log(__dirname + '/../../assets/videoplayback.mp4');
-        const rs = fs.createReadStream(__dirname + '/../../assets/videoplayback.mp4');
-        rs.pipe(res);
-    }
-    else {
+        const { genreTitle } = <Genre><unknown>await genreModel.
+                    findOne({ genreId: req?.params?.genreid }, 'genreTitle');
+        console.log(genreTitle);
+        if (!genreTitle) throw new Error(`Genre-${req?.params?.genreid} Not Available`); 
+        return genreTitle.toString();
+    } catch (e) {
         throw new Error(`Genre-${req.params.genreid} Not Available`);
     }
-    } catch(e) {
-        console.log(e);
-    }
 }
+
+// async function findAndRenderGenre(req: Request, res: Response) {
+//     try{
+//     const genreStaticFiles = <GenreStaticFiles><unknown>await genreStaticFilesModel.
+//     findOne({ genreId: req.params.genreid }, 'filename');
+    
+//     if (genreStaticFiles && genreStaticFiles.genreFileUrl) {
+//         res.writeHead(200, { 'Content-Type': 'video/mp4' });
+//         console.log(__dirname + '/../../assets/videoplayback.mp4');
+//         const rs = fs.createReadStream(__dirname + '/../../assets/videoplayback.mp4');
+//         rs.pipe(res);
+//     }
+//     else {
+//         throw new Error(`Genre-${req.params.genreid} Not Available`);
+//     }
+//     } catch(e) {
+//         console.log(e);
+//     }
+// }
 
 async function generateResponse() {
     try {
