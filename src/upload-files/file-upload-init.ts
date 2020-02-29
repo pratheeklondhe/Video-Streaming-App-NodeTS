@@ -1,11 +1,13 @@
 import multer from 'multer';
 import GridFsStorage from 'multer-gridfs-storage';
-import { mongoURI, genreVideoDBcollectionName } from './../config/appconfig';
+import { mongoURI, genreVideoDBcollectionName, Mongo, mongooseConnection } from './../config/appconfig';
+import Grid from 'gridfs-stream';
+import { Connection } from 'mongoose';
 
 const storage = new GridFsStorage({
     url: mongoURI,
-    file: (req: any, file) => {
-        return new Promise((resolve, reject) => {
+    file: (_req, file) => {
+        return new Promise((resolve, _reject) => {
             const fileInfo = {
                 filename: file.originalname,
                 bucketName: genreVideoDBcollectionName
@@ -13,6 +15,11 @@ const storage = new GridFsStorage({
             resolve(fileInfo);
         })
     }
-})
+});
+
+export function createGridStream(mongooseConnectn = mongooseConnection.db, mongo = Mongo.mongo): Grid.Grid {
+    return Grid(mongooseConnectn, mongo);
+}
+
 
 export const upload = multer({ storage });

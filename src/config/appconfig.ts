@@ -2,10 +2,13 @@ import express from 'express';
 import path from 'path';
 import mongoose from 'mongoose';
 
-const app = express();
-const env = process.env.NODE_ENV || 'development';
+
 export const genreVideoDBcollectionName = 'genreVideo';
 export const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/local_sample';
+const env = process.env.NODE_ENV || 'development';
+let mongooseConnection: mongoose.Connection;
+
+const app = express();
 
 let App = {
     port: process.env.PORT || 3000,
@@ -20,7 +23,7 @@ let App = {
     },
     async mongoConnect() {
         try{
-            await mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true});
+            mongooseConnection = await mongoose.createConnection(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true});
             return `Mongoose Connected to ${mongoURI}`;
         } catch(e) {
             throw new Error(`Could not Connect to ${mongoURI}`);
@@ -28,4 +31,4 @@ let App = {
     }
 };
 
-export {App, app, mongoose as Mongo};
+export {App, app, mongoose as Mongo, mongooseConnection};

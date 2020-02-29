@@ -1,10 +1,10 @@
-import {App ,app} from './config/appconfig';
+import { App, app, genreVideoDBcollectionName } from './config/appconfig';
 import { logger } from './middleware/logger';
 import bodyParser from 'body-parser';
 import { setCors } from './middleware/CORS';
 import { genreModel } from './genre/models/genre-model';
 import { initializeRouters } from './custom-utilities/router-initialize';
-import { upload }  from './upload-files/file-upload-init';
+import { upload, createGridStream } from './upload-files/file-upload-init';
 
 app.use(bodyParser.json());
 app.use(setCors);
@@ -13,19 +13,29 @@ initializeRouters(app);
 
 
 
-app.post('/genre' , (req) => {
-    try{
+app.post('/genre', (req) => {
+    try {
         (new genreModel(req.body) as any).validateRequirements();
         console.log(req.body);
         new genreModel(req.body).save();
-    } catch(e) {
+    } catch (e) {
         throw e;
     }
 });
 
-app.post('/' ,upload.single('cust'), (req, res) => {
+app.post('/', upload.single('cust'), (req, res) => {
     console.log(req.file);
     res.status(200).send('WOW, Iam up and running an Updated');
+});
+
+app.get('/', (req, res) => {
+    const gfs = createGridStream();
+    gfs.collection(genreVideoDBcollectionName);
+    const readstream = gfs.createReadStream({
+        filename: 'package.json'
+    });
+    // res.writeHead(200, { 'Content-Type': 'video/mp4' });
+    readstream.pipe(res);
 });
 
 
