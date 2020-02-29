@@ -4,15 +4,13 @@ import bodyParser from 'body-parser';
 import { setCors } from './middleware/CORS';
 import { genreModel } from './genre/models/genre-model';
 import { initializeRouters } from './custom-utilities/router-initialize';
-
-import multer from 'multer';
+import { upload }  from './upload-files/file-upload-init';
 
 app.use(bodyParser.json());
 app.use(setCors);
 app.use(logger);
 initializeRouters(app);
 
-const upload = multer({ dest: 'uploads/' })
 
 
 app.post('/genre' , (req) => {
@@ -30,11 +28,10 @@ app.post('/' ,upload.single('cust'), (req, res) => {
     res.status(200).send('WOW, Iam up and running an Updated');
 });
 
-App.start();
 
 App.mongoConnect()
     .then((data: string) => {
-        // App.start();
+        App.start();
         console.log(data);
     })
     .catch((err: Error) => console.error(err.message));

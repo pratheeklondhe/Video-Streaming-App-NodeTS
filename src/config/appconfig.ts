@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 
 const app = express();
 const env = process.env.NODE_ENV || 'development';
-const mongodb = process.env.MONGODB_URI || 'mongodb://localhost/local_sample';
+export const genreVideoDBcollectionName = 'genreVideo';
+export const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/local_sample';
 
 let App = {
     port: process.env.PORT || 3000,
@@ -19,10 +20,10 @@ let App = {
     },
     async mongoConnect() {
         try{
-            await mongoose.connect(mongodb, {useNewUrlParser: true, useUnifiedTopology: true});
-            return `Mongoose Connected to ${mongodb}`;
+            await mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true});
+            return `Mongoose Connected to ${mongoURI}`;
         } catch(e) {
-            throw new Error(`Could not Connect to ${mongodb}`);
+            throw new Error(`Could not Connect to ${mongoURI}`);
         }
     }
 };
