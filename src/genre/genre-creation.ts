@@ -15,6 +15,25 @@ router.post('/addgenre', authenticateAdmin, (req: express.Request, res: express.
     saveGenreDetails(req.body, res);
 });
 
+router.post('/updategenre', authenticateAdmin, (req: express.Request, res: express.Response) => {
+    updateGenre(req.body, req, res);
+});
+
+async function updateGenre(genre: Genre, req: express.Request, res: express.Response) {
+    try {
+        const joiRes = genreSchema.validate(req.body);
+        if (joiRes.error) throw joiRes?.error?.details[0];
+        const filter = { genreId: genre?.genreId };
+        const update = { title: genre?.title, description: genre?.description };
+        const options = { new: true };
+        const updatedGenre = await genreModel.findOneAndUpdate(filter, update, options);
+        if (!updatedGenre) throw new Error(`Failed To Update ${genre?.genreId}`);
+        res.status(200).send(updatedGenre);
+    } catch (e) {
+        res.status(400).send(errBuilder(e?.message, 'GenreUpdateError'));
+    }
+}
+
 router.post('/uploadgenre',
     // authenticateAdmin,
     upload.single('genrevideo'), (req: express.Request, res: express.Response) => {

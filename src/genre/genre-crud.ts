@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { genreModel, Genre } from './models/genre-model';
 import { Categories } from './entity/genre-categories';
 import { errBuilder } from '../custom-utilities/error-service';
-import { authenticateUser, authenticateUserAsString } from '../middleware/auth-token';
+import { authenticateUser, authenticateUserAsString, authenticateAdmin } from '../middleware/auth-token';
 import fs from 'fs';
 import { genreStaticFilesModel, GenreStaticFiles } from './models/genre-static-files-model';
 import { streamGenre } from '../stream-files/genre-stream';
@@ -14,23 +14,35 @@ router.get('/getinitial', authenticateUser, async (req: Request, res: Response) 
     try {
         res.status(200).send(await generateResponse());
     } catch (e) {
-        res.status(404).send(errBuilder(e ?.message, 'GenreError'));
+        res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
 });
 
 /**
  * Requires genreid to be passed as query param
  */
-router.get('/getgenre', authenticateUser, async (req: Request, res: Response) => {
+router.get('/getgenre', authenticateUser, (req: Request, res: Response) => {
     try {
-        if (!req.query.genreid) throw new Error('Invalid Genre');
-        const genre = await genreModel.findOne({ genreId: req ?.query ?.genreid });
-        if (genre) res.status(200).send(genre);
-        else throw new Error('Invalid Genre');
+        getGenreByGenreId(req, res);
     } catch (e) {
-        res.status(404).send(errBuilder(e ?.message, 'GenreError'));
+        res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
 });
+
+router.get('/getgenrebygenreid', authenticateAdmin, (req: Request, res: Response) => {
+    try {
+        getGenreByGenreId(req, res);
+    } catch (e) {
+        res.status(404).send(errBuilder(e?.message, 'GenreError'));
+    }
+});
+
+async function getGenreByGenreId(req: Request, res: Response) {
+    if (!req.query.genreid) throw new Error('Invalid Genre');
+    const genre = await genreModel.findOne({ genreId: req?.query?.genreid });
+    if (genre) res.status(200).send(genre);
+    else throw new Error('Invalid Genre');
+}
 
 /**
  * Requires category, skip and limit to be passed as query param
@@ -62,16 +74,36 @@ router.get('/stream/:genreid/:token', async (req: Request, res: Response) => {
         const genreTitle = await getGenreTitle(req, res);
         streamGenre(req, res, genreTitle);
     } catch (e) {
-        res.status(404).send(errBuilder(e ?.message, 'GenreError'));
+        res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
 });
 
-async function getGenreTitle(req: Request, res: Response): Promise<string>{
-    try{
+router.post('/listgenreofcategory', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+        const genreList = await genreModel.find({ category: { $in: req?.body?.selectedCategory } }
+            , 'genreId category title');
+        if (!genreList || !genreList.length) throw new Error();
+        res.status(200).send(genreList);
+    } catch (e) {
+        res.status(400).send(errBuilder('Genre/s Unavailable', 'GenreError'));
+    }
+});
+
+router.get('/getcategorylist', authenticateAdmin, (req: Request, res: Response) => {
+    try {
+        const catgryList = Object.values(Categories);
+        res.status(200).send(catgryList);
+    } catch (e) {
+        res.status(400).send(errBuilder(e?.message, 'GenreError'));
+    }
+});
+
+async function getGenreTitle(req: Request, res: Response): Promise<string> {
+    try {
         const { genreTitle } = <Genre><unknown>await genreModel.
-                    findOne({ genreId: req?.params?.genreid }, 'genreTitle');
+            findOne({ genreId: req?.params?.genreid }, 'genreTitle');
         console.log(genreTitle);
-        if (!genreTitle) throw new Error(`Genre-${req?.params?.genreid} Not Available`); 
+        if (!genreTitle) throw new Error(`Genre-${req?.params?.genreid} Not Available`);
         return genreTitle.toString();
     } catch (e) {
         throw new Error(`Genre-${req.params.genreid} Not Available`);
@@ -82,7 +114,7 @@ async function getGenreTitle(req: Request, res: Response): Promise<string>{
 //     try{
 //     const genreStaticFiles = <GenreStaticFiles><unknown>await genreStaticFilesModel.
 //     findOne({ genreId: req.params.genreid }, 'filename');
-    
+
 //     if (genreStaticFiles && genreStaticFiles.genreFileUrl) {
 //         res.writeHead(200, { 'Content-Type': 'video/mp4' });
 //         console.log(__dirname + '/../../assets/videoplayback.mp4');

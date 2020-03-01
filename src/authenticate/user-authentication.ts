@@ -24,7 +24,7 @@ async function validateUser(req: Request, res: Response) {
             let responseHeader = new ResponseHeader(req.body.email, _id, role);
             const token = (new userModel() as any).generateAuthToken(responseHeader);
             const userName = (<userClass><unknown>data).userName;
-            res.header('x-auth-token', token).status(200).send({name: userName, message: 'User Validated Successfully'}); 
+            res.header('x-auth-token', token).status(200).send({name: userName, message: 'User Validated Successfully', role: role.toUpperCase()}); 
         }
         else { 
             throw new Error('Check Username and Password1'); 
