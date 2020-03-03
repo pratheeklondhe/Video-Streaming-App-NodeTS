@@ -1,14 +1,13 @@
 import express, { Request, Response } from 'express';
-import { genreModel, Genre } from './models/genre-model';
+import { genreModel, Genre, GenreFile } from './models/genre-model';
 import { Categories } from './entity/genre-categories';
 import { errBuilder } from '../custom-utilities/error-service';
 import { authenticateUser, authenticateUserAsString, authenticateAdmin } from '../middleware/auth-token';
-import fs from 'fs';
-import { genreStaticFilesModel, GenreStaticFiles } from './models/genre-static-files-model';
 import { streamGenre } from '../stream-files/genre-stream';
+import { createGridStream } from '../stream-files/file-stream-init';
 
 
-const router = express.Router();
+const   router = express.Router();
 
 router.get('/getinitial', authenticateUser, async (req: Request, res: Response) => {
     try {
@@ -31,7 +30,7 @@ router.get('/getgenre', authenticateUser, (req: Request, res: Response) => {
 
 router.get('/getgenrebygenreid', authenticateAdmin, (req: Request, res: Response) => {
     try {
-        getGenreByGenreId(req, res);
+        getGenreByGenreIdWithFileDetails(req, res);
     } catch (e) {
         res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
@@ -42,6 +41,54 @@ async function getGenreByGenreId(req: Request, res: Response) {
     const genre = await genreModel.findOne({ genreId: req?.query?.genreid });
     if (genre) res.status(200).send(genre);
     else throw new Error('Invalid Genre');
+}
+
+async function getGenreByGenreIdWithFileDetails(req: Request, res: Response) {
+    try {
+        if (!req.query.genreid) throw new Error('Invalid Genre');
+        let genre: GenreFile = await <GenreFile><unknown>genreModel.findOne({ genreId: req?.query?.genreid });
+        // try {
+            getGenreFileDetails(genre?.genreTitle?.toString(), genre, res);
+        //     genre.filename = genreFile?.filename || '';
+        //     genre.lengthInString = genreFile?.length || '0 Byte';
+        // } catch (e) {
+        //     genre.filename = '';
+        //     genre.lengthInString = '0 Byte';
+        // }
+        // if (genre) res.status(200).send(genre);
+        // else throw new Error('Invalid Genre');
+    } catch (e) {
+        throw new Error('Invalid Genre');
+    }
+}
+
+function getGenreFileDetails(fileName: string, genre: GenreFile, res: Response) {
+    try {
+        const gfs = createGridStream();
+        let genreTemp = genre;
+        gfs.files.findOne({ filename: fileName }, (err, file) => {
+            if (err) throw new Error();
+            if (1) {
+                genreTemp.year = file.filename;
+                genreTemp['filename'] = 'Banro le';
+                genreTemp.lengthInString = bytesToSize(file.length || 0);
+                console.log(genreTemp);
+                if (genreTemp) res.status(200).send(genreTemp);
+
+            }
+            // if (genreTemp) res.status(200).send(genreTemp);
+            else throw new Error('Invalid Genre');
+        });
+    } catch (e) {
+        throw new Error('Invalid Genre');
+    }
+}
+
+function bytesToSize(bytes: number) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return '0 Byte';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(Number((bytes / Math.pow(1024, i)).toFixed(2))) + ' ' + sizes[i];
 }
 
 /**

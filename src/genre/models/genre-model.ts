@@ -55,3 +55,9 @@ export interface Genre {
     episodeNo: Number
 }
 
+export interface GenreFile extends Genre {
+    filename: String,
+    length: number,
+    lengthInString: String
+}
+
