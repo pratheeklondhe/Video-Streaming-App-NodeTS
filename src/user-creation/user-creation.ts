@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { userRegSchema } from './joi_schema/user-registration';
-import { userModel } from './models/user-model';
+import { userModel, userClass } from './models/user-model';
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import { authenticateUser } from '../middleware/auth-token';
@@ -31,6 +31,16 @@ async function saveUserDetails(obj:any, res:Response){
         res.status(200).send(_.pick(obj, ['userName', 'email']));
     } catch (e) {
         res.status(400).send(`Something went wrong.Try again.`);
+    }
+}
+
+export async function filterUserDetails(email: string, ...filterProps: string[]) {
+    try{
+        const filter = { email: email };
+        const returnProps = filterProps.join(' ');
+        return <userClass><unknown>await userModel.findOne(filter, returnProps);
+    } catch (e) {
+        throw new Error(`Error Occurred`);
     }
 }
 

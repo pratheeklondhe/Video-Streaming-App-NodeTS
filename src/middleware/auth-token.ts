@@ -14,6 +14,11 @@ export function authenticateUser(req: customRequest, res: any, next: any) {
     }
 }
 
+export function returnEmailFromToken(req: customRequest, res: any) {
+        const decodedToken = authenticateToken(req, res);
+        return decodedToken ?.email;
+}
+
 export function authenticateAdmin(req: customRequest, res: any, next: any) {
     try {
         const decodedToken = authenticateToken(req, res);
