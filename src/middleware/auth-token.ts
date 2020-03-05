@@ -51,7 +51,7 @@ export function authenticateUserAsString(token: string): boolean {
     }
 }
 
-function authenticateTokenAsString(token: string) {
+export function authenticateTokenAsString(token: string) {
     try {
         return <token>jwt.verify(token, PRIVATE_KEY);
     } catch (e) {

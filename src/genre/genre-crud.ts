@@ -5,6 +5,7 @@ import { errBuilder } from '../custom-utilities/error-service';
 import { authenticateUser, authenticateUserAsString, authenticateAdmin } from '../middleware/auth-token';
 import { streamGenre } from '../stream-files/genre-stream';
 import { createGridStream } from '../stream-files/file-stream-init';
+import { genreWatchTracking } from '../user-activity-tracking/about-page-tracking';
 
 
 const   router = express.Router();
@@ -117,9 +118,12 @@ router.get('/getgenreofcategory', authenticateUser, async (req: Request, res: Re
  */
 router.get('/stream/:genreid/:token', async (req: Request, res: Response) => {
     try {
-        authenticateUserAsString(req.params.token);
+        authenticateUserAsString(req?.params?.token);
         const genreTitle = await getGenreTitle(req, res);
         streamGenre(req, res, genreTitle);
+        
+        // 
+        genreWatchTracking(req?.params?.token, req?.params?.genreid);
     } catch (e) {
         res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
@@ -190,6 +194,17 @@ async function generateResponse() {
         return obj;
     } catch (e) {
         throw e;
+    }
+}
+
+export async function getTitleFromGenreId(genreId: String) {
+    try{
+        const find = { genreId };
+        const { title } = <Genre><unknown> await genreModel.findOne(find).select('title');
+        if (!title) return '';
+        else return title;
+    } catch (e) {
+        return '';
     }
 }
 

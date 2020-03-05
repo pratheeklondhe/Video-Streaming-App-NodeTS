@@ -9,5 +9,5 @@ export function initializeRouters(app: any) {
     app.use('/api/userauthentication' , userAuthenticationRouter);
     app.use('/api/genre', genreRouter);
     app.use('/api/retreivegenre', genreCrudRouter);
-    app.use('api/session', aboutPageTrackingRouter)
+    app.use('/api/session', aboutPageTrackingRouter)
 }
