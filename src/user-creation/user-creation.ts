@@ -5,13 +5,18 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import { authenticateUser } from '../middleware/auth-token';
 import { Roles } from './entity/roles';
+import { errBuilder } from '../custom-utilities/error-service';
 
 let router = express.Router();
 
 router.post('/register' , (req: Request, res: Response) => {
-    const joiRes = userRegSchema.validate(req.body);
-    if (joiRes.error) throw joiRes?.error?.details[0]?.message;
-    saveUserDetails(_.pick(req.body, ['userName', 'email', 'password']), res);    
+    try {
+        const joiRes = userRegSchema.validate(req.body);
+        if (joiRes.error) throw new Error(joiRes?.error?.details[0]?.message);
+        saveUserDetails(_.pick(req.body, ['userName', 'email', 'password']), res);    
+    } catch (e) {
+        res.status(400).send(errBuilder(e?.message));
+    }
 });
 
 router.post('/registersimple', authenticateUser, (req: Request, res: Response) => {
@@ -23,14 +28,10 @@ async function saveUserDetails(obj:any, res:Response){
         obj.devPass = obj.password;
         obj.role = Roles.USER;
         obj.password = await bcrypt.hash(obj.password, await bcrypt.genSalt(10));
-    } catch (e){
-        throw new Error(`Something went wrong.Try again.`);
-    }
-    try{
         await new userModel(obj).save();
         res.status(200).send(_.pick(obj, ['userName', 'email']));
     } catch (e) {
-        res.status(400).send(`Something went wrong.Try again.`);
+        res.status(400).send(errBuilder(e?.message));
     }
 }
 
