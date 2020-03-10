@@ -6,6 +6,7 @@ import { authenticateUser, authenticateUserAsString, authenticateAdmin } from '.
 import { streamGenre } from '../stream-files/genre-stream';
 import { createGridStream } from '../stream-files/file-stream-init';
 import { genreWatchTracking } from '../user-activity-tracking/about-page-tracking';
+import { GenreOrderModel, GenreOrder } from './models/genre-order-model';
 
 
 const   router = express.Router();
@@ -191,8 +192,10 @@ async function generateResponse() {
             const query = { category: { $in: [categyValues[i]] } };
             obj[categyKeys[i]] = await genreModel.find(query, responseProperties);
         }
-
-        obj.genreOrder = [{key: 'TRENDING', value: 'Trending'}, {key: 'ADVENTURE', value: 'Adventure'}];
+        const defaultOrder = [{key: 'TRENDING', value: 'Trending'}, {key: 'ADVENTURE', value: 'Adventure'}];
+        const genreOrder: GenreOrder = <GenreOrder><unknown>await GenreOrderModel.findOne();
+        console.log(genreOrder);
+        obj.genreOrder = (genreOrder && genreOrder.genreOrder.length)? genreOrder.genreOrder : defaultOrder;
         return obj;
     } catch (e) {
         throw e;
