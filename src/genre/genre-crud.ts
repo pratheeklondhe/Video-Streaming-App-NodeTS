@@ -191,6 +191,8 @@ async function generateResponse() {
             const query = { category: { $in: [categyValues[i]] } };
             obj[categyKeys[i]] = await genreModel.find(query, responseProperties);
         }
+
+        obj.genreOrder = [{key: 'TRENDING', value: 'Trending'}, {key: 'ADVENTURE', value: 'Adventure'}];
         return obj;
     } catch (e) {
         throw e;
