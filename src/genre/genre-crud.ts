@@ -7,6 +7,7 @@ import { streamGenre } from '../stream-files/genre-stream';
 import { createGridStream } from '../stream-files/file-stream-init';
 import { genreWatchTracking } from '../user-activity-tracking/about-page-tracking';
 import { GenreOrderModel, GenreOrder } from './models/genre-order-model';
+import { genreVideoDBcollectionName } from '../config/appconfig';
 
 
 const   router = express.Router();
@@ -48,7 +49,8 @@ async function getGenreByGenreId(req: Request, res: Response) {
 async function getGenreByGenreIdWithFileDetails(req: Request, res: Response) {
     try {
         if (!req.query.genreid) throw new Error('Invalid Genre');
-        let genre: GenreFile = await <GenreFile><unknown>genreModel.findOne({ genreId: req?.query?.genreid });
+        let genre: GenreFile = await <GenreFile><unknown>
+        genreModel.findOne({ genreId: req?.query?.genreid });
         // try {
             getGenreFileDetails(genre?.genreTitle?.toString(), genre, res);
         //     genre.filename = genreFile?.filename || '';
@@ -68,10 +70,11 @@ function getGenreFileDetails(fileName: string, genre: GenreFile, res: Response) 
     try {
         const gfs = createGridStream();
         let genreTemp = genre;
-        gfs.files.findOne({ filename: fileName }, (err, file) => {
+        gfs.files.find({ filename: fileName})
+            .toArray((err, file) => {
             if (err) throw new Error();
-            if (1) {
-                genreTemp.year = file.filename;
+            if (file) {
+                genreTemp.year = '';
                 genreTemp['filename'] = 'Banro le';
                 genreTemp.lengthInString = bytesToSize(file.length || 0);
                 console.log(genreTemp);
@@ -79,7 +82,7 @@ function getGenreFileDetails(fileName: string, genre: GenreFile, res: Response) 
 
             }
             // if (genreTemp) res.status(200).send(genreTemp);
-            else throw new Error('Invalid Genre');
+            else res.status(200).send(genreTemp);
         });
     } catch (e) {
         throw new Error('Invalid Genre');
@@ -127,6 +130,20 @@ router.get('/stream/:genreid/:token', async (req: Request, res: Response) => {
         genreWatchTracking(req?.params?.token, req?.params?.genreid);
     } catch (e) {
         res.status(404).send(errBuilder(e?.message, 'GenreError'));
+    }
+});
+
+router.get('/deletegenre/:fileName', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+        console.log(req?.params?.fileName);
+        if (!req?.params?.fileName) throw new Error(`File Name Not Provided`);
+        const gfs = createGridStream();
+        gfs.remove({filename: req?.params?.fileName, root: genreVideoDBcollectionName} , (err) => {
+            if (err) throw new Error(`Error Deleting ${req?.params?.fileName}`);
+            res.status(200).send({ flag: true, message: `SuccessFully Deleted ${req?.params?.fileName}.` })
+        });
+    } catch (e) {
+        res.status(400).send(errBuilder(e?.message));
     }
 });
 
