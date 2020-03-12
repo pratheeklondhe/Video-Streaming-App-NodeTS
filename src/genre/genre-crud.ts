@@ -137,11 +137,28 @@ router.get('/deletegenre/:fileName', authenticateAdmin, async (req: Request, res
     try {
         console.log(req?.params?.fileName);
         if (!req?.params?.fileName) throw new Error(`File Name Not Provided`);
-        const gfs = createGridStream();
-        gfs.remove({filename: req?.params?.fileName, root: genreVideoDBcollectionName} , (err) => {
-            if (err) throw new Error(`Error Deleting ${req?.params?.fileName}`);
-            res.status(200).send({ flag: true, message: `SuccessFully Deleted ${req?.params?.fileName}.` })
-        });
+        deleteGenrefile(req?.params?.fileName, req, res);
+    } catch (e) {
+        res.status(400).send(errBuilder(e?.message));
+    }
+});
+
+function deleteGenrefile(filename: string, req: Request, res: Response) {
+    const gfs = createGridStream();
+    gfs.remove({filename: filename, root: genreVideoDBcollectionName} , (err) => {
+        if (err) throw new Error(`Error Deleting ${req?.params?.fileName}`);
+        res.status(200).send({ flag: true, message: `SuccessFully Deleted ${req?.params?.fileName}.` })
+    });
+}
+
+router.get('/removegenre', authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+        if (!req?.query?.genreId) throw new Error(`Genre Id Is Required`);
+        if (!req?.query?.genreTitle) throw new Error(`Genre Title Is Required`);
+        const query = { genreId: req?.query?.genreId };
+        const obj = await genreModel.findOneAndDelete(query);
+        deleteGenrefile(req?.query?.genreTitle, req, res);
+        if (!obj) throw new Error(`Error Deleting ${req?.query?.genreId}`);
     } catch (e) {
         res.status(400).send(errBuilder(e?.message));
     }
@@ -150,7 +167,7 @@ router.get('/deletegenre/:fileName', authenticateAdmin, async (req: Request, res
 router.post('/listgenreofcategory', authenticateAdmin, async (req: Request, res: Response) => {
     try {
         const genreList = await genreModel.find({ category: { $in: req?.body?.selectedCategory } }
-            , 'genreId category title');
+            , 'genreId category title genreTitle');
         if (!genreList || !genreList.length) throw new Error();
         res.status(200).send(genreList);
     } catch (e) {
