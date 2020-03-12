@@ -24,9 +24,12 @@ async function updateGenre(genre: Genre, req: express.Request, res: express.Resp
         const joiRes = genreSchema.validate(req.body);
         if (joiRes.error) throw joiRes?.error?.details[0];
         const filter = { genreId: genre?.genreId };
-        const update = { title: genre?.title, description: genre?.description };
+        const update = { title: genre?.title,
+            description: genre?.description,
+            displayImg: genre?.displayImg,
+             };
         const options = { new: true };
-        const updatedGenre = await genreModel.findOneAndUpdate(filter, update, options);
+        const updatedGenre = await genreModel.findOneAndUpdate(filter, req.body, options);
         if (!updatedGenre) throw new Error(`Failed To Update ${genre?.genreId}`);
         res.status(200).send(updatedGenre);
     } catch (e) {

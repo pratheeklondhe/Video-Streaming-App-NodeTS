@@ -74,7 +74,7 @@ function getGenreFileDetails(fileName: string, genre: GenreFile, res: Response) 
             .toArray((err, file) => {
             if (err) throw new Error();
             if (file) {
-                genreTemp.year = '';
+                genreTemp.filename = '';
                 genreTemp['filename'] = 'Banro le';
                 genreTemp.lengthInString = bytesToSize(file.length || 0);
                 console.log(genreTemp);
