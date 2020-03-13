@@ -109,7 +109,7 @@ router.get('/getgenreofcategory', authenticateUser, async (req: Request, res: Re
             category: { $in: [req.query.category] },
             genreId: { $ne: req.query.genreId }
         }
-        ).limit(2);
+        );
         if (genres) res.status(200).send(genres);
         else throw new Error('Invalid Category');
     } catch (e) {
