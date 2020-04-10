@@ -217,6 +217,7 @@ async function getGenreTitle(req: Request, res: Response): Promise<string> {
 
 async function generateResponse() {
     try {
+        console.log('Started Logic');
         const categyValues = Object.values(Categories);
         const categyKeys = Object.keys(Categories);
         const obj: any = {};
@@ -230,6 +231,7 @@ async function generateResponse() {
         const genreOrder: GenreOrder = <GenreOrder><unknown>await GenreOrderModel.findOne();
         console.log(genreOrder);
         obj.genreOrder = (genreOrder && genreOrder.genreOrder.length)? genreOrder.genreOrder : defaultOrder;
+        console.log('Ended Logic');
         return obj;
     } catch (e) {
         throw e;
