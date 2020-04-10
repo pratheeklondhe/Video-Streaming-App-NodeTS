@@ -226,7 +226,7 @@ async function generateResponse() {
         const responseProperties = ['genreId', 'screenshots',
              'title', 'description', 'category'];
         for (let i = 0; i < categyKeys.length; i++) {
-            const query = { category: { $in: [categyValues[i]] }, show: true };
+            const query = { category: { $in: [categyValues[i]] } };
             obj[categyKeys[i]] = await genreModel.find(query, responseProperties);
         }
         const defaultOrder = [{key: 'TRENDING', value: 'Trending'}, {key: 'ADVENTURE', value: 'Adventure'}];
