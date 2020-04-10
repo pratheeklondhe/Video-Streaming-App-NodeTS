@@ -41,7 +41,7 @@ router.post('/uploadgenre',
     // authenticateAdmin,
     upload.single('genrevideo'), (req: express.Request, res: express.Response) => {
         try {
-            console.log(req?.file);
+            // console.log(req?.file);
             res.status(200).send({ success: true, message: 'Uploaded Successfully' });
         } catch (e) {
             res.status(400).send(errBuilder('Error while Uploading', 'GenreUploadError'));

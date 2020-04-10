@@ -68,6 +68,7 @@ function getISTString(date: Date) {
 
 export async function genreWatchTracking(token: string, genreid: string) {
     try {
+        console.log("Genre Watch Tracking");
         const { email } = authenticateTokenAsString(token);
         const find = { email };
         const title = await getTitleFromGenreId(genreid);
