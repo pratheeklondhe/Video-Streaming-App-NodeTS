@@ -14,7 +14,9 @@ const   router = express.Router();
 
 router.get('/getinitial', authenticateUser, async (req: Request, res: Response) => {
     try {
-        res.status(200).send(await generateResponse());
+        const response = await generateResponse();
+        console.log(response);
+        res.status(200).send(response);
     } catch (e) {
         res.status(404).send(errBuilder(e?.message, 'GenreError'));
     }
@@ -224,7 +226,7 @@ async function generateResponse() {
         const responseProperties = ['genreId', 'screenshots',
             'displayImg', 'title', 'description', 'category'];
         for (let i = 0; i < categyKeys.length; i++) {
-            const query = { category: { $in: [categyValues[i]] } };
+            const query = { category: { $in: [categyValues[i]] }, show: true };
             obj[categyKeys[i]] = await genreModel.find(query, responseProperties);
         }
         const defaultOrder = [{key: 'TRENDING', value: 'Trending'}, {key: 'ADVENTURE', value: 'Adventure'}];

@@ -11,6 +11,7 @@ export var genreSchema = new Mongo.Schema({
     category: { type: [String], enum: [...Object.values(Categories)], required: true },
     year: String,
     displayImg: String,
+    show: { type: Boolean, default: true},
     screenshots: { type: [String] },
     isSeries: { type: Boolean, default: false, required: true },
     cast: String,
