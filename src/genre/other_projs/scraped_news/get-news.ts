@@ -12,8 +12,15 @@ router.get('/get-data/:url', (req: Request, res: Response) => {
 });
 
 function getData(options: any) {
+    console.log('========HERE IS URL=========');
+    console.log(options.host);
+
     http.get(options, (res) => {
+            console.log('========HERE IS RESPONSE=========');
+
         console.log(res);
+            console.log('========HERE IS RESPONSE END=========');
+
         
     });
 }
