@@ -3,10 +3,10 @@ import http from 'http';
 let router = express.Router();
 
 
-router.get('/get-data', (req: Request, res: Response) => {
+router.get('/get-data/:url', (req: Request, res: Response) => {
   const options = {
-    host: 'www.google.com',
-    path: '/index.html'
+    host: req?.params?.url,
+    path: '/'
     };
     getData(options);
 });
@@ -14,7 +14,7 @@ router.get('/get-data', (req: Request, res: Response) => {
 function getData(options: any) {
     http.get(options, (res) => {
         console.log(res);
-        // res.
+        
     });
 }
 
