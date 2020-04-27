@@ -17,3 +17,5 @@ function getData(options: any) {
         // res.
     });
 }
+
+export {router as getScrapedNewsRouter};
